@@ -1,15 +1,16 @@
 package com.nabto.cassandra.prometheus;
 
-import io.prometheus.client.CollectorRegistry;
-
-import org.apache.cassandra.metrics.CassandraMetricsRegistry;
+import com.codahale.metrics.jvm.BufferPoolMetricSet;
+import com.codahale.metrics.jvm.FileDescriptorRatioGauge;
+import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
+import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
 
 import com.codahale.metrics.*;
 
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +32,11 @@ public class PrometheusExports extends io.prometheus.client.Collector implements
      */
     public PrometheusExports(MetricRegistry registry) {
         this.registry = registry;
+        
+        this.registry.register("jvm.buffers", new BufferPoolMetricSet(ManagementFactory.getPlatformMBeanServer()));
+        this.registry.register("jvm.gc", new GarbageCollectorMetricSet());
+        this.registry.register("jvm.memory", new MemoryUsageGaugeSet());
+        this.registry.register("jvm.fd.usage", new FileDescriptorRatioGauge());
     }
     
     /**
